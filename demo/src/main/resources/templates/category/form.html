@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <title>Category Form</title>
+    </head>
+    <body>
+        <form th:action="@{/category/save}" th:object="${category}" method="post">
+            <!-- ID -->
+            <input id="id" placeholder="Masukkan ID" type="text" th:field="*{id}" hidden/>
+            <!-- Name -->
+            <input id="name" placeholder="Masukkan Nama" type="text" th:field="*{name}"/>
+            <!-- SUBMIT -->
+            <button type="submit"> Submit </button>
+        </form>
+    </body>
+</html>

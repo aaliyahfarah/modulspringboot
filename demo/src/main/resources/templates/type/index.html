@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <title>Type Management</title>
+    </head>
+    <body>
+        <!-- <a th:href="@{/vehicle/form}">CREATE NEW VEHICLE</a> -->
+        <a th:href="@{'/type/form'}">
+            <button>CREATE NEW TYPE</button>
+         </a>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>NAME</th>
+                    <th>YEAR</th>
+                    <th>PRICE</th>
+                    <th>BRAND</th>
+                    <th>CATEGORY</th>
+                    <th colspan="2">ACTION</th>  
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="type : ${types}"> 
+                    <td th:text="${type.id}"></td>
+                    <td th:text="${type.name}"></td>
+                    <td th:text="${type.year}"></td>
+                    <td th:text="'Rp' + ${#numbers.formatDecimal(type.price, 2, 2)}"></td>
+                    <!-- <td th:text="${(type.price)}"></td> -->
+                    <!-- <td th:text="${String.format('%.2f', type.price)}"></td> -->
+                    <!-- String.format("%.2f", getPrice()) -->
+                    <td th:text="${type.brand}"></td>
+                    <td th:text="${type.category}"></td> 
+                    <td>
+                        <a th:href="@{'/type/form/' + ${type.id}}" style="display:inline;">
+                            <button>EDIT</button>
+                        </a> 
+                    </td>
+                        <td>
+                        <form method="POST" th:action="@{'/type/delete/' + ${type.id}}" style="display:inline;">
+                            <button type="submit" onclick="return confirm('Apakah anda yakin ingin menghapus?');">DELETE</button>
+                        </form>
+                    </td>
+                </tr> 
+            </tbody> 
+        </table>
+    </body>
+</html>

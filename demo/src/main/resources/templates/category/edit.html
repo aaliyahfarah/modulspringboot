@@ -1,0 +1,18 @@
+<html>
+    <head>
+        <title>Category Edit</title>
+    </head>
+    <body>
+        <form th:action="@{/category/save}" th:object="${category}" method="post">
+            <!-- ID -->
+            <input id="id" placeholder="ID" type="text" th:field="*{id}" readonly/>
+
+            <!-- Name field -->
+            <input type="text" id="name" th:field="*{name}" />
+
+            <!-- Submit button -->
+            <button type="submit">Save</button>
+
+        </form>
+    </body>
+</html>

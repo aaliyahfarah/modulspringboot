@@ -1,0 +1,36 @@
+<html>
+    <head>
+        <title>Category Management</title>
+    </head>
+    <body>
+        <!-- <a th:href="@{/category/form}">CREATE NEW CATEGORY</a> -->
+        <a th:href="@{/category/form}">
+            <button>CREATE NEW CATEGORY</button>
+         </a>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>NAME</th>
+                    <th colspan="2">ACTION</th>  
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="category : ${categories}">
+                    <td th:text="${category.id}"></td>
+                    <td th:text="${category.name}"></td>
+                    <td>
+                        <a th:href="@{'/category/form/' + ${category.id}}">
+                            <button>EDIT</button>
+                         </a>
+                    </td>
+                    <td>
+                        <form method="POST" th:action="@{'/category/delete/' + ${category.id}}" style="display:inline;">
+                            <button type="submit" onclick="return confirm('Apakah anda yakin ingin menghapus?');">DELETE</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>
