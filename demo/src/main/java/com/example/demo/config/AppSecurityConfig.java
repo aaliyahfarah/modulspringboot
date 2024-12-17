@@ -32,7 +32,7 @@ public class AppSecurityConfig {
                                 .antMatchers("/user/**").hasRole("user")
                                 .antMatchers("/role/**").hasAnyAuthority("master")
                                 .antMatchers("admin/**", "/type/**", "/dashboard/**").authenticated()
-                                .antMatchers("/user-management/login").permitAll()
+                                .antMatchers("/user-management/login", "/user-management/register").permitAll()
                                 .and()
                                 .formLogin()
                                 .loginPage("/user-management/login")

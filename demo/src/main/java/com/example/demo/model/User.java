@@ -35,5 +35,8 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user")
+    private List<PasswordResetToken> passwordResetTokens;
+
+    @OneToMany(mappedBy = "user")
     private List<Purchase> purchases;
 }

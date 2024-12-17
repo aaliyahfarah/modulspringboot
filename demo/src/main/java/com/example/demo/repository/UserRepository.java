@@ -1,7 +1,5 @@
 package com.example.demo.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,5 +14,7 @@ public interface UserRepository extends JpaRepository<User, Integer>{
     @Query("SELECT new com.example.demo.model.dto.UserDTO(u.id, p.firstName, p.lastName, r.name, u.password) FROM User u JOIN u.role r JOIN u.person p WHERE p.email = :userEmail")
     UserDTO getUsingDTO(@Param(value= "userEmail") String email);
 
+    @Query("SELECT u FROM User u JOIN u.person p WHERE p.email = :email")
+    User findByEmail(@Param("email") String email);
 }
 

@@ -12,7 +12,7 @@ import com.example.demo.model.dto.LoginDTO;
 public class DashboardController{
     @GetMapping
     public String index(Model model) {
-        model.addAttribute("login", new LoginDTO());
+        model.addAttribute("dashboard", new LoginDTO());
         return "dashboard/index";
     }
 }

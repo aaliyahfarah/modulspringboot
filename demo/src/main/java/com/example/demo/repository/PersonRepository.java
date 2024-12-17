@@ -7,5 +7,6 @@ import com.example.demo.model.Person;
 
 @Repository 
 public interface PersonRepository extends JpaRepository<Person, Integer>{
-    //boolean checkPhoneNumber(String phoneNumber);
+    boolean existsByTelephone(String telephone);
+    boolean existsByEmail(String email);
 }
