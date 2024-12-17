@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,13 +30,10 @@ public class PasswordResetService {
         this.tokenRepository = tokenRepository;
     }   
 
-    //      private Integer id;
-    //      private String token;
-    //      private LocalDateTime expirationDate;
     //exp 30 menit
-    private static final long EXPIRATION_TIME = 30;
+    private static final long EXPIRATION_TIME = 15;
 
-    public void generateResetToken(String email) {
+    public boolean generateResetToken(String email) {
         User user = userRepository.findByEmail(email);  
 
         if (user != null) {
@@ -45,14 +41,16 @@ public class PasswordResetService {
             PasswordResetToken passwordResetToken = new PasswordResetToken(token, user, LocalDateTime.now().plusMinutes(EXPIRATION_TIME));
             tokenRepository.save(passwordResetToken);
 
-            String subject = "Permintaan Perubahan Password pada Akun Bliken";
+            String subject = "Permintaan Perubahan Password pada Akun Bliken " + user.getPerson().getFirstName();
             String body = "Jangan berikan link ini kepada siapapun!\n\n" +
                         "Untuk mengganti password, tekan link di bawah ini :\n" + 
                           "http://localhost:8080/user-management/reset-password?token=" + token;
                       
-            sendEmailService.sendEmail(user.getPerson().getEmail(), subject, body);
+            if(sendEmailService.sendEmail(user.getPerson().getEmail(), subject, body)){
+                return true;
+            }else {return false;}
         } else {
-            throw new RuntimeException("User not found with email: " + email);
+            return false;
         }
     }
 
@@ -71,7 +69,7 @@ public class PasswordResetService {
         }
     }
 
-    public void resetPassword(String token, String newPassword) {
+    public Boolean resetPassword(String token, String newPassword) {
         Optional<PasswordResetToken> resetTokenOpt = tokenRepository.findByToken(token);
         if (resetTokenOpt.isPresent()) {
             PasswordResetToken resetToken = resetTokenOpt.get();
@@ -79,19 +77,16 @@ public class PasswordResetService {
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
 
-            String subject = "Perubahan Password pada Akun Bliken";
+            String subject = "Perubahan Password pada Akun Bliken " + user.getPerson().getFirstName();
             String body = "Halo " + user.getPerson().getFirstName() + "!,\n\n" +
-                        "Password anda telah diubah menjadi:\n\n" +
-                        "New Password: " + newPassword + "\n\n" +
+                        "Password anda telah diubah menjadi: " + newPassword + "\n\n" +
                         "Untuk alasan keaman, jangan berikan password ini kepada siapaun.\n\n" +
                         "Terima kasih";
-            sendEmailService.sendEmail(user.getPerson().getEmail(), subject, body);
-
-            // tokenRepository.deleteByToken(token);
-            tokenRepository.delete(resetToken);
-            System.out.println("Reset token deleted successfully.");
+            if(sendEmailService.sendEmail(user.getPerson().getEmail(), subject, body)){
+                return true;
+            }else {return false;}
         } else {
-            throw new RuntimeException("Invalid reset token.");
+            return false;
         }
     }
 }

@@ -3,19 +3,26 @@
         <title>Register</title>
     </head>
     <body>
+        <h1>Register</h1>
         <form th:action="@{/user-management/add}" th:object="${register}" method="post">
             <!-- first name -->
-            <input id="fname" placeholder="Masukkan Nama depan" type="text" th:field="*{firstName}"/>
+            <label>Nama depan :</label>
+            <input id="fname" placeholder="Masukkan Nama depan" type="text" th:field="*{firstName}"/><br><br>
             <!-- last name -->
-            <input id="lname" placeholder="Masukkan Nama belakang" type="text" th:field="*{lastName}"/>
+            <label>Nama belakang :</label>
+            <input id="lname" placeholder="Masukkan Nama belakang" type="text" th:field="*{lastName}"/><br><br>
             <!-- telephone -->
-            <input id="telephone" placeholder="Masukkan Nomor telepon" type="text" th:field="*{telephone}"/>
+            <label>No. Telepon :</label>
+            <input id="telephone" placeholder="Masukkan Nomor telepon" type="text" th:field="*{telephone}"/><br><br>
             <!-- address -->
-            <input id="address" placeholder="Masukkan Alamat" type="text" th:field="*{address}"/>
+            <label>Alamat :</label>
+            <input id="address" placeholder="Masukkan Alamat" type="text" th:field="*{address}"/><br><br>
             <!-- Email -->
-            <input id="email" placeholder="Masukkan Email" type="text" th:field="*{email}"/>
+            <label>Email :</label>
+            <input id="email" placeholder="Masukkan Email" type="text" th:field="*{email}"/><br><br>
             <!-- Password -->
-            <input id="pass" placeholder="Masukkan Password" type="password" th:field="*{password}"/>
+            <label>Password :</label>
+            <input id="pass" placeholder="Masukkan Password" type="password" th:field="*{password}"/><br><br>
             <!-- SUBMIT -->
             <button type="submit"> Submit </button>
         </form>

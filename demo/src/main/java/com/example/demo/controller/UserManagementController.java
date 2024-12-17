@@ -3,7 +3,7 @@ package com.example.demo.controller;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,6 +30,7 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.service.PasswordResetService;
 import com.example.demo.service.SendEmailService;
 import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.PasswordResetTokenRepository;
 import com.example.demo.repository.PersonRepository;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -44,11 +45,12 @@ public class UserManagementController {
     private PasswordEncoder passwordEncoder;
     private SendEmailService sendEmailService;
     private PasswordResetService passwordResetService;
+    private PasswordResetTokenRepository tokenRepository;
 
     @Autowired
     public UserManagementController(UserRepository userRepository, PasswordEncoder passwordEncoder, 
     RoleRepository roleRepository, PersonRepository personRepository, SendEmailService sendEmailService,
-    PasswordResetService passwordResetService
+    PasswordResetService passwordResetService, PasswordResetTokenRepository tokenRepository
     ){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -56,6 +58,7 @@ public class UserManagementController {
         this.roleRepository = roleRepository;
         this.sendEmailService = sendEmailService;
         this.passwordResetService = passwordResetService;
+        this.tokenRepository = tokenRepository;
     }   
 
     @GetMapping("register")
@@ -65,7 +68,8 @@ public class UserManagementController {
     }
 
     @PostMapping("add")
-    public String add(RegisterDTO registerDTO) {
+    public String add(RegisterDTO registerDTO, Model model) {
+        Boolean emailHandling = false;
         if (!personRepository.existsByTelephone(registerDTO.getTelephone())) {
             if (!personRepository.existsByEmail(registerDTO.getEmail())) {
                 Person person = new Person();
@@ -85,13 +89,23 @@ public class UserManagementController {
                 userRepository.save(user);
 
                 //tambahin timestamp/penomoran email
-                String subject = "Selamat datang di Bliken: Platform Jual Beli Kendaraan";
+                String subject = "Selamat datang di Bliken " +person.getFirstName();
                 String body = "Hi " + person.getFirstName() + "!," 
                 + "\n\nSelamat bergabung di Bliken!\n\n";
-                sendEmailService.sendEmail(person.getEmail(), subject, body);
+                emailHandling = sendEmailService.sendEmail(person.getEmail(), subject, body);
             }
         }
-        return "redirect:/user-management/login";
+        if(emailHandling){
+            model.addAttribute("message", "Register berhasil!");
+            model.addAttribute("buttonLink", "/user-management/login/");
+            model.addAttribute("buttonText", "Kembali ke Halaman Login");
+            return "user/message";    
+        }else{
+            model.addAttribute("message", "Register gagal!");
+            model.addAttribute("buttonLink", "/user-management/register/");
+            model.addAttribute("buttonText", "Kembali ke Halaman Register");  
+            return "user/message";  
+        }
     }
 
     // loginnn
@@ -102,7 +116,7 @@ public class UserManagementController {
     }
 
     @PostMapping("authenticate")
-    public String authenticate(LoginDTO login) {
+    public String authenticate(LoginDTO login, Model model) {
         UserDTO user = userRepository.getUsingDTO(login.getEmail());
         if(user != null && passwordEncoder.matches(login.getPassword(), user.getPassword())){
             try {
@@ -120,8 +134,10 @@ public class UserManagementController {
                 e.printStackTrace();
             }
         }
-        
-        return "redirect:/user-management/login";
+        model.addAttribute("message", "Email / Password anda salah");
+        model.addAttribute("buttonLink", "/user-management/login/");
+        model.addAttribute("buttonText", "Kembali ke Halaman Login");
+        return "user/message";
     }
 
     private static Collection<? extends GrantedAuthority> getAuthorities(String role){
@@ -139,10 +155,18 @@ public class UserManagementController {
 
     @PostMapping("forget-password")
     public String handleForgetPassword(@ModelAttribute ForgetPasswordDTO forgetPasswordDTO, Model model) {
-        passwordResetService.generateResetToken(forgetPasswordDTO.getEmail());
-
-        model.addAttribute("message", "Silahkan cek email anda");
-        return "user/message";
+        if(passwordResetService.generateResetToken(forgetPasswordDTO.getEmail())){
+            model.addAttribute("message", "Silahkan cek email anda untuk mereset password");
+            model.addAttribute("buttonLink", "/user-management/login/");
+            model.addAttribute("buttonText", "Kembali ke Halaman Login"); 
+            return "user/message";
+        }
+        else{
+            model.addAttribute("message", "Email tidak dapat ditemukan");
+            model.addAttribute("buttonLink", "/user-management/forget-password/");
+            model.addAttribute("buttonText", "Kembali"); 
+            return "user/message";
+        }
     }
 
     @GetMapping("reset-password")
@@ -151,18 +175,30 @@ public class UserManagementController {
             model.addAttribute("token", token);
             return "user/resetPassword"; 
         } else {
-            model.addAttribute("message", "Invalid or expired token.");
+            model.addAttribute("message", "Token Invalid atau Expired");
+            model.addAttribute("buttonLink", "/user-management/login/");
+            model.addAttribute("buttonText", "Kembali ke Halaman Login"); 
             return "user/message";
         }
     }
 
     @PostMapping("reset-password")
     public String handleResetPassword(@RequestParam("token") String token, @RequestParam("newPassword") String newPassword, Model model) {
-        System.out.println("Received token: " + token);
-        passwordResetService.resetPassword(token, newPassword);
+        if(passwordResetService.resetPassword(token, newPassword)){
+            Optional<PasswordResetToken> resetTokenOpt = tokenRepository.findByToken(token);
+            PasswordResetToken resetToken = resetTokenOpt.get();
+            tokenRepository.delete(resetToken);
 
-        model.addAttribute("message", "Password berhasil diubah");
-        return "user/message";  
+            model.addAttribute("message", "Password berhasil diubah");
+            model.addAttribute("buttonLink", "/user-management/login/");
+            model.addAttribute("buttonText", "Kembali ke Halaman Login");
+            return "user/message";
+        }else{
+            model.addAttribute("message", "Password gagal diubah");
+            model.addAttribute("buttonLink", "/user-management/login/");
+            model.addAttribute("buttonText", "Kembali ke Halaman Login");
+            return "user/message";
+        } 
     }
 
     @GetMapping("change-password")
@@ -184,24 +220,26 @@ public class UserManagementController {
         if (user != null) {
             if (passwordEncoder.matches(oldPassword, user.getPassword())) {
                 user.setPassword(passwordEncoder.encode(newPassword));
-                    userRepository.save(user);
+                userRepository.save(user);
 
-                    String subject = "Perubahan Password pada Akun Bliken";
-                    String body = "Halo " + user.getPerson().getFirstName() + "!,\n\n" +
+                String subject = "Perubahan Password pada Akun Bliken " + user.getPerson().getFirstName();
+                String body = "Halo " + user.getPerson().getFirstName() + "!,\n\n" +
                         "Password anda telah diubah menjadi:\n\n" +
                         "New Password: " + newPassword + "\n\n" +
-                        "Untuk alasan keaman, jangan berikan password ini kepada siapaun.\n\n" +
+                        "Untuk alasan keamanan, jangan berikan password ini kepada siapaun.\n\n" +
                         "Terima kasih";
-                    sendEmailService.sendEmail(user.getPerson().getEmail(), subject, body);
-
-                    model.addAttribute("message", "Password berhasil diubah");
+                sendEmailService.sendEmail(user.getPerson().getEmail(), subject, body);
+  
+                    model.addAttribute("message", "Password berhasil diubah, silahkan login kembali");
+                    model.addAttribute("buttonLink", "/user-management/login/");
+                    model.addAttribute("buttonText", "Halaman login");
                     return "user/message";
-            } else {
-                model.addAttribute("message", "Password salah");
-            }
+            } 
         }
 
-        model.addAttribute("message", "Error");
+        model.addAttribute("message", "Password salah");
+        model.addAttribute("buttonLink", "/user-management/forget-password/");
+        model.addAttribute("buttonText", "Forget password");
         return "user/message";  
     }
     

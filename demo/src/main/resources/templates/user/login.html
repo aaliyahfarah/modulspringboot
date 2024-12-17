@@ -3,11 +3,14 @@
         <title>Login</title>
     </head>
     <body>
+        <h1>Login</h1>
         <form th:action="@{/user-management/authenticate}" th:object="${login}" method="post">
             <!-- Email -->
-            <input id="id" placeholder="Masukkan Email" type="text" th:field="*{email}"/>
+            <label>Email : </label>
+            <input id="id" placeholder="Masukkan Email" type="text" th:field="*{email}"/><br><br>
             <!-- Password -->
-            <input id="name" placeholder="Masukkan Password" type="text" th:field="*{password}"/>
+            <label>Password :</label>
+            <input id="name" placeholder="Masukkan Password" type="password" th:field="*{password}"/><br><br>
             <!-- SUBMIT -->
             <button type="submit"> Submit </button>
         </form>

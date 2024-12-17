@@ -15,13 +15,19 @@ public class SendEmailService {
     private String fromEmailId;
 
     //dibuat non void
-    public void sendEmail(String recipient, String subject, String body){
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setFrom(fromEmailId);
-        mailMessage.setTo(recipient);
-        mailMessage.setText(body);
-        mailMessage.setSubject(subject);
+    public Boolean sendEmail(String recipient, String subject, String body){
+        try {
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setFrom(fromEmailId);
+            mailMessage.setTo(recipient);
+            mailMessage.setText(body);
+            mailMessage.setSubject(subject);
 
-        javaMailSender.send(mailMessage);
+            javaMailSender.send(mailMessage);
+            return true;
+        } catch (Exception e) {
+            // e.printStackTrace();  
+            return false;  
+        }
     }
 }

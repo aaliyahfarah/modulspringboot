@@ -53,9 +53,4 @@ public class AppSecurityConfig {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
-    // @Bean
-    // public CorsFilter corsFilter(){
-
-    // }
 }

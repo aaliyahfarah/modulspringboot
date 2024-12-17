@@ -26,6 +26,7 @@ public class ProfileController {
 
     @GetMapping
     public String index(Model model){
+        //security context holdernya userdto -> use pricipal
         // String user = SecurityContextHolder.getContext().getAuthentication().getName();
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Integer userId = null;
