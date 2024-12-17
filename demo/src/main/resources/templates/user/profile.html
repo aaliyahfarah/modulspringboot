@@ -1,0 +1,23 @@
+<html>
+    <head>
+        Profile
+    </head>
+    <body>
+        <form th:object="${profile}">
+            <!-- id -->
+            <input id="id" placeholder="Masukkan ID" type="text" th:field="*{id}" hidden/>
+            <input id="fname" placeholder="Masukkan Nama depan" type="text" th:field="*{firstName}" readonly/>
+            <!-- last name -->
+            <input id="lname" placeholder="Masukkan Nama belakang" type="text" th:field="*{lastName}" readonly/>
+            <!-- telephone -->
+            <input id="telephone" placeholder="Masukkan Nomor telepon" type="text" th:field="*{telephone}" readonly/>
+            <!-- address -->
+            <input id="address" placeholder="Masukkan Alamat" type="text" th:field="*{address}" readonly/>
+            <!-- Email -->
+            <input id="email" placeholder="Masukkan Email" type="text" th:field="*{email}" readonly/>
+        </form>
+        <a th:href="@{/user-management/change-password}">
+            <button>Change Password </button>
+        </a>
+    </body>
+</html>>

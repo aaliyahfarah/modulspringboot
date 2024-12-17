@@ -84,6 +84,7 @@ public class UserManagementController {
                 user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
                 userRepository.save(user);
 
+                //tambahin timestamp/penomoran email
                 String subject = "Selamat datang di Bliken: Platform Jual Beli Kendaraan";
                 String body = "Hi " + person.getFirstName() + "!," 
                 + "\n\nSelamat bergabung di Bliken!\n\n";
@@ -137,9 +138,11 @@ public class UserManagementController {
     }
 
     @PostMapping("forget-password")
-    public String handleForgetPassword(@ModelAttribute ForgetPasswordDTO forgetPasswordDTO) {
+    public String handleForgetPassword(@ModelAttribute ForgetPasswordDTO forgetPasswordDTO, Model model) {
         passwordResetService.generateResetToken(forgetPasswordDTO.getEmail());
-        return "user/forgetPasswordSuccess"; 
+
+        model.addAttribute("message", "Silahkan cek email anda");
+        return "user/message";
     }
 
     @GetMapping("reset-password")
@@ -159,7 +162,47 @@ public class UserManagementController {
         passwordResetService.resetPassword(token, newPassword);
 
         model.addAttribute("message", "Password berhasil diubah");
-
         return "user/message";  
     }
+
+    @GetMapping("change-password")
+    public String showChangePasswordForm(Model model) {
+        return "user/changePassword";
+    }
+
+    @PostMapping("change-password")
+    public String handleChangePassword(@RequestParam("oldPassword") String oldPassword, @RequestParam("newPassword") String newPassword, Model model) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = null;
+
+        if (principal instanceof UserDTO) {
+            UserDTO user = (UserDTO) principal;
+            userId = user.getId();
+        }
+
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                    userRepository.save(user);
+
+                    String subject = "Perubahan Password pada Akun Bliken";
+                    String body = "Halo " + user.getPerson().getFirstName() + "!,\n\n" +
+                        "Password anda telah diubah menjadi:\n\n" +
+                        "New Password: " + newPassword + "\n\n" +
+                        "Untuk alasan keaman, jangan berikan password ini kepada siapaun.\n\n" +
+                        "Terima kasih";
+                    sendEmailService.sendEmail(user.getPerson().getEmail(), subject, body);
+
+                    model.addAttribute("message", "Password berhasil diubah");
+                    return "user/message";
+            } else {
+                model.addAttribute("message", "Password salah");
+            }
+        }
+
+        model.addAttribute("message", "Error");
+        return "user/message";  
+    }
+    
 }

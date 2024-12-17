@@ -29,9 +29,8 @@ public class AppSecurityConfig {
                         auth
                                 // .antMatchers("/").permitAll() landing page
                                 .antMatchers("/category/**").hasAuthority("master")
-                                .antMatchers("/user/**").hasRole("user")
                                 .antMatchers("/role/**").hasAnyAuthority("master")
-                                .antMatchers("admin/**", "/type/**", "/dashboard/**").authenticated()
+                                .antMatchers("admin/**", "/type/**", "/dashboard/**", "/profile/**").authenticated()
                                 .antMatchers("/user-management/login", "/user-management/register").permitAll()
                                 .and()
                                 .formLogin()
