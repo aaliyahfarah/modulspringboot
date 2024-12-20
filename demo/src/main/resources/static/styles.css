@@ -21,23 +21,6 @@
   width: 100%;
 }
 
-.dataTables_length,
-.dataTables_info,
-.dataTables_paginate {
-  display: inline-block;
-  margin-right: 10px;
-}
-
-.dataTables_length,
-.dataTables_info {
-  flex: 1;  
-}
-
-.dataTables_paginate {
-  flex: 1; 
-  text-align: right;
-}
-
 .bottom {
   display: flex;
   justify-content: space-between;
