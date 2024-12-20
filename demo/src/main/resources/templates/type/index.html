@@ -2,26 +2,44 @@
 
 <head>
   <title>Type Management</title>
+
+  <link rel="stylesheet" href="/styles.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-  <!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" /> -->
   <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.1/css/buttons.dataTables.min.css">
 </head>
 
 <body>
-  <div class="container-fluid mt-3 mb-3 ms-3 me-3">
-    <!-- <a th:href="@{/vehicle/form}">CREATE NEW VEHICLE</a> -->
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
-      Create new type
-    </button>
-    <!-- <a th:href="@{'/type/form'}">
-          <button>CREATE NEW TYPE</button>
-      </a> -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="container-fluid pt-3 pb-3 ps-3 pe-3">
+    <div class="mb-4">
+      <h1 class="fw-bold text-center">Type Management</h1>
+    </div>
+    <div class="row">
+
+    <div>
+      <div class="container-fluid" style="width:95%">
+        <table id="typeTable" class="display" style="width:100%">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Nama</th>
+              <th>Tahun</th>
+              <th>Harga</th>
+              <th>Merek</th>
+              <th>Kategori</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+    
+    <div class="modal fade" id="typeModal" tabindex="-1" aria-labelledby="typeModal" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Create category</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Type</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -31,19 +49,19 @@
             <div class="input-group input-group-sm mb-3">
               <span class="input-group-text" id="inputGroup-sizing-sm">Nama Tipe</span>
               <input type="text" class="form-control" placeholder="Masukkan tipe" aria-label="nama tipe"
-                aria-describedby="inputGroup-sizing-sm" required />
+                aria-describedby="inputGroup-sizing-sm" id="typeName" required />
             </div>
             <!-- tahun -->
             <div class="input-group input-group-sm mb-3">
               <span class="input-group-text" id="inputGroup-sizing-sm">Tahun</span>
               <input type="text" class="form-control" placeholder="Masukkan tahun" aria-label="tahun"
-                aria-describedby="inputGroup-sizing-sm" required />
+                aria-describedby="inputGroup-sizing-sm" id="typeYear" required />
             </div>
             <!-- Price -->
             <div class="input-group input-group-sm mb-3">
               <span class="input-group-text" id="inputGroup-sizing-sm">Harga</span>
               <input type="text" class="form-control" placeholder="Masukkan harga" aria-label="harga"
-                aria-describedby="inputGroup-sizing-sm" required />
+                aria-describedby="inputGroup-sizing-sm" id="typePrice" required />
             </div>
             <!-- Dropdown Brand -->
             <div class="input-group input-group-sm mb-3">
@@ -60,124 +78,244 @@
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
               Close
             </button>
-            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-primary" onclick="saveType()">Save changes</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="container-fluid">
-      <table id="typeTable" class="display" style="width:100%">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Nama</th>
-            <th>Tahun</th>
-            <th>Harga</th>
-            <th>Merek</th>
-            <th>Kategori</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-      </table>
-    </div>
-    <!-- <td th:text="${type.brand}"></td>
-          <td th:text="${type.category}"></td>
-          <td>
-            <a th:href="@{'/type/form/' + ${type.id}}" style="display: inline">
-              <button>EDIT</button>
-            </a>
-          </td>
-          <td>
-            <form method="POST" th:action="@{'/type/delete/' + ${type.id}}" style="display: inline">
-              <button type="submit" onclick="return confirm('Apakah anda yakin ingin menghapus?');">
-                DELETE
-              </button>
-            </form>
-          </td>
+
   </div>
-<!-- </body> -->
+</body>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-      crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script type="text/javascript" charset="utf8"
+  src="https://cdn.datatables.net/buttons/2.3.1/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" charset="utf8"
+  src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 
-    <!-- script -->
-    <script>
-      $(document).ready(function () {
-        $.ajax({
-          url: '/api/brand',
-          type: 'GET',
-          success: function (data) {
-            $('#optionBrand').empty();
+<script>
+  function brandOption(selectBrandId = null) {
+    $.ajax({
+      url: '/api/brand',
+      type: 'GET',
+      success: function (data) {
+        $('#optionBrand').empty();
 
-            $('#optionBrand').append('<option value="" disabled selected>Pilih brand</option>');
+        $('#optionBrand').append('<option value="" disabled selected>Pilih brand</option>');
 
-            $.each(data, function (index, brand) {
-              var option = $('<option>', {
-                value: brand.id,
-                text: brand.name
-              });
-              $('#optionBrand').append(option);
-            });
+        $.each(data, function (index, brand) {
+          var option = $('<option>', {
+            value: brand.id,
+            text: brand.name
+          });
+
+          if (brand.id === selectBrandId) {
+            option.prop('selected', true);
           }
+          $('#optionBrand').append(option);
         });
+      }
+    });
+  }
 
-        $.ajax({
-          url: '/api/category',
-          type: 'GET',
-          success: function (data) {
-            $('#optionCategory').empty();
+  //category option
+  function categoryOption(selectCategoryId = null) {
+    $.ajax({
+      url: '/api/category',
+      type: 'GET',
+      success: function (data) {
+        $('#optionCategory').empty();
 
-            $('#optionCategory').append('<option value="" disabled selected>Pilih kategori</option>');
+        $('#optionCategory').append('<option value="" disabled selected>Pilih kategori</option>');
 
-            $.each(data, function (index, category) {
-              var option = $('<option>', {
-                value: category.id,
-                text: category.name
-              });
-              $('#optionCategory').append(option);
-            });
+        $.each(data, function (index, category) {
+          var option = $('<option>', {
+            value: category.id,
+            text: category.name
+          });
+
+          if (category.id === selectCategoryId) {
+            option.prop('selected', true);
           }
+          $('#optionCategory').append(option);
         });
-        $('#typeTable').DataTable({
-          ajax: {
-            url: '/api/type',
-            type: 'GET',
-            dataSrc: function (json) {
-              return json;
-            }
-          },
-          columns: [
-            { data: 'id' },
-            { data: 'name' },
-            { data: 'year' },
-            {
-              data: 'price',
-              render: function (data, type, row) {
-                if (type === 'display') {
-                  return 'Rp ' + data.toLocaleString('id-ID') + ',00';
-                }
-                return data;
-              },
-              type: 'num',
-            },
-            { data: 'brand.name' },
-            { data: 'category.name' },
-            {
-              data: null, 
-              render: function (data, type, row) {
-                return `
-                <button class="btn btn-primary btn-sm" onclick="editRow(${row.id})">Edit</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteRow(${row.id})">Delete</button>
-              `;
-              }
-            }
-          ]
-        });
+      }
+    });
+  }
+
+  //create 
+  function createType() {
+    $('#id').val('');
+    $('#typeName').val('');
+    $('#typeYear').val('');
+    $('#typePrice').val('');
+    $('#optionBrand').val('');
+    $('#optionCategory').val('');
+    brandOption();
+    categoryOption();
+
+    $('#typeModal').modal('show');
+  }
+
+  function editType(id) {
+    $.ajax({
+      url: '/api/type/' + id,
+      type: 'GET',
+      success: function (data) {
+        // console.log(data);
+        $('#id').val(data.id);
+        $('#typeName').val(data.name);
+        $('#typeYear').val(data.year);
+        $('#typePrice').val(data.price);
+
+        brandOption(data.brand.id);
+        categoryOption(data.category.id);
+
+        $('#typeModal').modal('show');
+      },
+      error: function (xhr, status, error) {
+        alert('Error fetching data: ' + error);
+      }
+    });
+  }
+
+  //save
+  function saveType(typeMethod) {
+    var typeId = $('#id').val();
+    var typeName = $('#typeName').val();
+    var typeYear = $('#typeYear').val();
+    var typePrice = $('#typePrice').val();
+    var brandId = $('#optionBrand').val();
+    var categoryId = $('#optionCategory').val();
+
+    console.log(brandId);
+
+    if (!typeName || !typeYear || !typePrice || !brandId || !categoryId) {
+      alert('Please fill all required fields!');
+      return;
+    }
+    //create
+    else if (!typeId) {
+      $.ajax({
+        url: '/api/type/create',
+        type: 'POST',
+        data: JSON.stringify({
+          name: typeName,
+          year: typeYear,
+          price: typePrice,
+          brand: { id: brandId },
+          category: { id: categoryId }
+        }),
+        contentType: 'application/json',
+        success: function (response) {
+          $('#typeModal').modal('hide');
+          $('#typeTable').DataTable().ajax.reload();
+        },
+        error: function (xhr, status, error) {
+          alert('Error: ' + error);
+        }
       });
-    </script>
+    }
+    //edit
+    else {
+      $.ajax({
+        url: '/api/type/edit/' + typeId,
+        type: 'PUT',
+        data: JSON.stringify({
+          id: typeId,
+          name: typeName,
+          year: typeYear,
+          price: typePrice,
+          brand: { id: brandId },
+          category: { id: categoryId }
+        }),
+        contentType: 'application/json',
+        success: function (response) {
+          $('#typeModal').modal('hide');
+          $('#typeTable').DataTable().ajax.reload();
+        },
+        error: function (xhr, status, error) {
+          alert('Error: ' + error);
+        }
+      });
+    }
+  }
+
+  //delete
+  function deleteType(id) {
+    if (confirm('Apakah anda yakin ingin menghapusnya?')) {
+      $.ajax({
+        url: '/api/type/delete/' + id,
+        type: 'DELETE',
+        success: function (data) {
+          $('#typeTable').DataTable().ajax.reload();
+        },
+        error: function (xhr, status, error) {
+          alert('Error fetching data: ' + error);
+        }
+      });
+    } else {
+      return;
+    }
+  }
+
+  $(document).ready(function () {
+    //datatable
+    $('#typeTable').DataTable({
+      ajax: {
+        url: '/api/type',
+        type: 'GET',
+        dataSrc: function (json) {
+          return json;
+        }
+      },
+      dom: '<"top"Bf>rt<"bottom"ilp><"clear">',
+        buttons: [
+          {
+            text: 'Create new type',
+            className: 'btn btn-primary mb-3',  // Button styling
+            action: function (e, dt, node, config) {
+              // Action to show the modal or perform the creation logic
+              $('#typeModal').modal('show'); // Show the modal
+            }
+          }
+        ],
+      columns: [
+        { data: 'id' },
+        { data: 'name' },
+        { data: 'year' },
+        {
+          data: 'price',
+          render: function (data, type, row) {
+            if (type === 'display' && data != null) {
+              return 'Rp ' + parseFloat(data).toLocaleString('id-ID') + ',00';
+            }
+            return data;
+          },
+          type: 'num',
+        },
+        { data: 'brand.name' },
+        { data: 'category.name' },
+        {
+          data: 'id',
+          render: function (data, type, row) {
+            return `
+                <button class="btn btn-primary btn-sm" onclick="editType(${row.id})">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteType(${row.id})">Delete</button>
+              `;
+          }
+        }
+      ],
+
+      columnDefs: [
+        { orderable: false, targets: 6 }
+      ]
+    });
+  });
+</script>
 
 </html>
