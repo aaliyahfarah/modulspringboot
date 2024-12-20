@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("category")
-public class CategoryController {
+@RequestMapping("brand")
+public class BrandController {
     @GetMapping
     public String index() {
-        return "category/index"; 
+        return "brand/index"; 
     }
 }

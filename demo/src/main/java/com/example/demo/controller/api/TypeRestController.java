@@ -2,8 +2,6 @@ package com.example.demo.controller.api;
 
 import java.util.List;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +48,7 @@ public class TypeRestController {
     }
 
     // create
-    @PostMapping("/type/create")
+    @PostMapping("type/create")
     public ResponseEntity<Object> create(@RequestBody Type type) {
         Brand brand = brandRepository.findById(type.getBrand().getId()).orElse(null);
         Category category = categoryRepository.findById(type.getCategory().getId()).orElse(null);
@@ -67,13 +65,13 @@ public class TypeRestController {
     }
 
     // edit
-    @PutMapping("/type/edit/{id}")
+    @PutMapping("type/edit/{id}")
     public ResponseEntity<Object> edit(@RequestBody Type type) {
         Brand brand = brandRepository.findById(type.getBrand().getId()).orElse(null);
         Category category = categoryRepository.findById(type.getCategory().getId()).orElse(null);
 
         Type existingType = typeRepository.findById(type.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + type.getId()));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid type ID: " + type.getId()));
         existingType.setName(type.getName());
         existingType.setYear(type.getYear());
         existingType.setPrice(type.getPrice());

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Category Management</title>
+        <title>Brand Management</title>
 
         <link rel="stylesheet" href="/styles.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -12,13 +12,13 @@
     <body>
         <div class="container-fluid pt-3 pb-3 ps-3 pe-3">
           <div class="mb-4">
-            <h1 class="fw-bold text-center">Category Management</h1>
+            <h1 class="fw-bold text-center">Brand Management</h1>
           </div>
           <div class="row">
       
           <div>
             <div class="container-fluid" style="width:95%">
-              <table id="categoryTable" class="display" style="width:100%">
+              <table id="brandTable" class="display" style="width:100%">
                 <thead>
                   <tr>
                     <th>Id</th>
@@ -30,11 +30,11 @@
             </div>
           </div>
           
-          <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModal" aria-hidden="true">
+          <div class="modal fade" id="brandModal" tabindex="-1" aria-labelledby="brandModal" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Category</h5>
+                  <h5 class="modal-title" id="exampleModalLabel">Brand</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -43,15 +43,15 @@
                   <!-- nama -->
                   <div class="input-group input-group-sm mb-3">
                     <!-- <span class="input-group-text" id="inputGroup-sizing-sm">Nama Kategori</span> -->
-                    <input type="text" class="form-control" placeholder="Masukkan nama kategori" aria-label="nama tipe"
-                      aria-describedby="inputGroup-sizing-sm" id="categoryName" required />
+                    <input type="text" class="form-control" placeholder="Masukkan nama brand" aria-label="nama tipe"
+                      aria-describedby="inputGroup-sizing-sm" id="brandName" required />
                   </div>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Close
                   </button>
-                  <button type="button" class="btn btn-primary" onclick="saveCategory()">Save</button>
+                  <button type="button" class="btn btn-primary" onclick="saveBrand()">Save</button>
                 </div>
               </div>
             </div>
@@ -70,23 +70,23 @@
     
     <script>
       //create 
-      function createCategory() {
+      function createBrand() {
         $('#id').val('');
-        $('#categoryName').val('');
+        $('#brandName').val('');
     
-        $('#categoryModal').modal('show');
+        $('#brandModal').modal('show');
       }
     
-      function editCategory(id) {
+      function editBrand(id) {
         $.ajax({
-          url: '/api/category/' + id,
+          url: '/api/brand/' + id,
           type: 'GET',
           success: function (data) {
             // console.log(data);
             $('#id').val(data.id);
-            $('#categoryName').val(data.name);
+            $('#brandName').val(data.name);
     
-            $('#categoryModal').modal('show');
+            $('#brandModal').modal('show');
           },
           error: function (xhr, status, error) {
             alert('Error fetching data: ' + error);
@@ -95,28 +95,28 @@
       }
     
       //save
-      function saveCategory() {
-        var categoryId = $('#id').val();
-        var categoryName = $('#categoryName').val();
+      function saveBrand() {
+        var brandId = $('#id').val();
+        var brandName = $('#brandName').val();
     
-        console.log(categoryId);
+        console.log(brandId);
     
-        if (!categoryName) {
+        if (!brandName) {
           alert('Please fill all required fields!');
           return;
         }
         //create
-        else if (!categoryId) {
+        else if (!brandId) {
           $.ajax({
-            url: '/api/category/create',
+            url: '/api/brand/create',
             type: 'POST',
             data: JSON.stringify({
-              name: categoryName,
+              name: brandName,
             }),
             contentType: 'application/json',
             success: function (response) {
-              $('#categoryModal').modal('hide');
-              $('#categoryTable').DataTable().ajax.reload();
+              $('#brandModal').modal('hide');
+              $('#brandTable').DataTable().ajax.reload();
             },
             error: function (xhr, status, error) {
               alert('Error: ' + error);
@@ -126,16 +126,16 @@
         //edit
         else {
           $.ajax({
-            url: '/api/category/edit/' + categoryId,
+            url: '/api/brand/edit/' + brandId,
             type: 'PUT',
             data: JSON.stringify({
-              id: categoryId,
-              name: categoryName,
+              id: brandId,
+              name: brandName,
             }),
             contentType: 'application/json',
             success: function (response) {
-              $('#categoryModal').modal('hide');
-              $('#categoryTable').DataTable().ajax.reload();
+              $('#brandModal').modal('hide');
+              $('#brandTable').DataTable().ajax.reload();
             },
             error: function (xhr, status, error) {
               alert('Error: ' + error);
@@ -145,13 +145,13 @@
       }
     
       //delete
-      function deleteCategory(id) {
+      function deleteBrand(id) {
         if (confirm('Apakah anda yakin ingin menghapusnya?')) {
           $.ajax({
-            url: '/api/category/delete/' + id,
+            url: '/api/brand/delete/' + id,
             type: 'DELETE',
             success: function (data) {
-              $('#categoryTable').DataTable().ajax.reload();
+              $('#brandTable').DataTable().ajax.reload();
             },
             error: function (xhr, status, error) {
               alert('Error fetching data: ' + error);
@@ -164,9 +164,9 @@
     
       $(document).ready(function () {
         //datatable
-        $('#categoryTable').DataTable({
+        $('#brandTable').DataTable({
           ajax: {
-            url: '/api/category',
+            url: '/api/brand',
             type: 'GET',
             dataSrc: function (json) {
               return json;
@@ -175,10 +175,10 @@
           dom: '<"top"Bf>rt<"bottom"ilp><"clear">',
           buttons: [
             {
-              text: 'Create new category',
+              text: 'Create new brand',
               className: 'btn btn-primary mb-3',
               action: function (e, dt, node, config) {
-                createCategory();
+                createBrand();
               }
             }
           ],
@@ -189,8 +189,8 @@
               data: 'id',
               render: function (data, type, row) {
                 return `
-                    <button class="btn btn-primary btn-sm" onclick="editCategory(${row.id})">Edit</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteCategory(${row.id})">Delete</button>
+                    <button class="btn btn-primary btn-sm" onclick="editBrand(${row.id})">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteBrand(${row.id})">Delete</button>
                   `;
               }
             }

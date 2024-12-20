@@ -1,8 +1,5 @@
 package com.example.demo.config;
 
-import javax.management.RuntimeErrorException;
-
-import org.apache.catalina.filters.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

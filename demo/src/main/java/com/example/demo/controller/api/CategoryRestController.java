@@ -1,13 +1,15 @@
 package com.example.demo.controller.api;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,73 +21,44 @@ import com.example.demo.utils.CustomResponse;
 @RestController
 @RequestMapping("api")
 public class CategoryRestController {
-    private CategoryRepository categoryRepository;
-
-    @Autowired
-    public CategoryRestController(CategoryRepository categoryRepository){
-        this.categoryRepository = categoryRepository;
-    }
+    @Autowired private CategoryRepository categoryRepository;
 
     @GetMapping("category")
-    public List<Category> get(){
-        // model.addAttribute("categories", categoryRepository.findAll());
-        return  categoryRepository.findAll();
+    public List<Category> get() {
+        return categoryRepository.findAll();
     }
 
-    @GetMapping(value = {"/category/add", "/category/{id}"})
-    public ResponseEntity<Object> form(@PathVariable(required = false) Integer id, Model model){
-        if(id != null){
-            Category category = categoryRepository.findById(id).orElse(null);
-            model.addAttribute("category", category);
-            return CustomResponse.generate(HttpStatus.OK, "edit data");
-        }
-        else{
-            model.addAttribute("category", new Category());
-            return CustomResponse.generate(HttpStatus.OK, "data berhasil ditambahkan");
-        }
+    @GetMapping("category/{id}")
+    public Category get(@PathVariable(required = true) Integer id) {
+        return categoryRepository.findById(id).orElse(null);
     }
 
-    @PostMapping("/save")
-    public ResponseEntity<Object> save(@RequestBody Category category) {
-        if (category.getId() != null) {
-            Category existingCategory = categoryRepository.findById(category.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + category.getId()));
-
-            existingCategory.setName(category.getName());
-            categoryRepository.save(existingCategory);
-        }
-        else{
+    // create
+    @PostMapping("/category/create")
+    public ResponseEntity<Object> create(@RequestBody Category category) {
         categoryRepository.save(category);
-        }
         return CustomResponse.generate(HttpStatus.OK, "data berhasil ditambahkan");
     }
 
-    // @PostMapping("role")
-    // public Role post(@RequestBody Role role) {
-    //     return roleRepository.save(role);
-    // }
+    //update
+    @PutMapping("/category/edit/{id}")
+    public ResponseEntity<Object> add(@RequestBody Category category) {
+        Category existingCategory = categoryRepository.findById(category.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid category ID: " + category.getId()));
 
-    // @PostMapping("role")
-    // public ResponseEntity<Object> post(@RequestBody Role role){
-    //     return CustomResponse.generate(HttpStatus.OK, "data berhasil ditambahkan", roleRepository.save(role));
-    // }
+        existingCategory.setName(category.getName());
+        categoryRepository.save(existingCategory);
+        return CustomResponse.generate(HttpStatus.OK, "data berhasil ditambahkan");
+    }
 
-    // @DeleteMapping("role/{id}")
-    // public Boolean delete(@PathVariable(required = true) Integer id){
-    //     roleRepository.deleteById(id);
-    //     return roleRepository.findById(id).isEmpty();
-    // }
-
-    // @DeleteMapping("role/{id}")
-    // public ResponseEntity<Object> delete(@PathVariable(required = true) Integer id){
-    //     roleRepository.deleteById(id);
-    //     // Role role = roleRepository.findById(id).isEmpty();
-    //     if(roleRepository.findById(id).isEmpty() == true){
-    //         return CustomResponse.generate(HttpStatus.OK, "data berhasil dihapus");
-    //     }
-    //     else{
-    //         return CustomResponse.generate(HttpStatus.OK, "data gagal dihapus");
-    //     }
-    // }
-    
+    @DeleteMapping("category/delete/{id}")
+    public ResponseEntity<Object> delete(@PathVariable(required = true) Integer id){
+        categoryRepository.deleteById(id);
+        if(categoryRepository.findById(id).isEmpty() == true){
+            return CustomResponse.generate(HttpStatus.OK, "data berhasil dihapus");
+        }
+        else{
+            return CustomResponse.generate(HttpStatus.OK, "data gagal dihapus");
+        }
+    }
 }
