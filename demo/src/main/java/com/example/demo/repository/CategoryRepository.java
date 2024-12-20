@@ -9,6 +9,7 @@ import com.example.demo.model.Category;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer>{
     Category findByName(String name);
+    // Category findById(Integer id);
     // @Query("SELECT Category FROM Category ORDER BY t.id")
     // public List<TypeDTO> getUsingDTO();
 

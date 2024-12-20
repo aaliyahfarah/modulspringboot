@@ -12,6 +12,7 @@ import com.example.demo.model.PasswordResetToken;
 import com.example.demo.model.User;
 import com.example.demo.repository.PasswordResetTokenRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.utils.SendEmailService;
 
 @Service
 public class PasswordResetService {

@@ -28,10 +28,11 @@ public class AppSecurityConfig {
                     try{
                         auth
                                 // .antMatchers("/").permitAll() landing page
-                                .antMatchers("/category/**").hasAuthority("master")
+                                .antMatchers("/category/**").permitAll()
                                 .antMatchers("/role/**").hasAnyAuthority("master")
-                                .antMatchers("admin/**", "/type/**", "/dashboard/**", "/profile/**").authenticated()
-                                .antMatchers("/user-management/login", "/user-management/register").permitAll()
+                                .antMatchers("admin/**", "/type/**", "/dashboard/**", "/profile/**").permitAll()
+                                .antMatchers("api/user/change-password").authenticated()
+                                .antMatchers("/user-management/login", "/user-management/register", "category/**").permitAll()
                                 .and()
                                 .formLogin()
                                 .loginPage("/user-management/login")

@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.demo.controller.api;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -6,17 +6,19 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.PasswordResetToken;
 import com.example.demo.model.Person;
@@ -26,19 +28,17 @@ import com.example.demo.model.dto.ForgetPasswordDTO;
 import com.example.demo.model.dto.LoginDTO;
 import com.example.demo.model.dto.RegisterDTO;
 import com.example.demo.model.dto.UserDTO;
-import com.example.demo.repository.UserRepository;
-import com.example.demo.service.PasswordResetService;
-import com.example.demo.utils.SendEmailService;
-import com.example.demo.repository.RoleRepository;
 import com.example.demo.repository.PasswordResetTokenRepository;
 import com.example.demo.repository.PersonRepository;
-import org.springframework.web.bind.annotation.RequestParam;
+import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.service.PasswordResetService;
+import com.example.demo.utils.CustomResponse;
+import com.example.demo.utils.SendEmailService;
 
-
-
-@Controller
-@RequestMapping("user-management")
-public class UserManagementController {
+@RestController
+@RequestMapping("api")
+public class UserRestController {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PersonRepository personRepository;
@@ -48,7 +48,7 @@ public class UserManagementController {
     private PasswordResetTokenRepository tokenRepository;
 
     @Autowired
-    public UserManagementController(UserRepository userRepository, PasswordEncoder passwordEncoder, 
+    public UserRestController(UserRepository userRepository, PasswordEncoder passwordEncoder, 
     RoleRepository roleRepository, PersonRepository personRepository, SendEmailService sendEmailService,
     PasswordResetService passwordResetService, PasswordResetTokenRepository tokenRepository
     ){
@@ -61,15 +61,10 @@ public class UserManagementController {
         this.tokenRepository = tokenRepository;
     }   
 
-    @GetMapping("register")
-    public String register(Model model) {
-        model.addAttribute("register", new RegisterDTO());
-        return "user/register";
-    }
-
-    @PostMapping("add")
-    public String add(RegisterDTO registerDTO, Model model) {
-        Boolean emailHandling = false;
+    // register
+    @PostMapping("user/register")
+    public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO) {
+        boolean emailHandling = false;
         if (!personRepository.existsByTelephone(registerDTO.getTelephone())) {
             if (!personRepository.existsByEmail(registerDTO.getEmail())) {
                 Person person = new Person();
@@ -88,35 +83,25 @@ public class UserManagementController {
                 user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
                 userRepository.save(user);
 
-                //tambahin timestamp/penomoran email
-                String subject = "Selamat datang di Bliken " +person.getFirstName();
-                String body = "Hi " + person.getFirstName() + "!," 
-                + "\n\nSelamat bergabung di Bliken!\n\n";
+                // Send welcome email
+                String subject = "Selamat datang di Bliken " + person.getFirstName();
+                String body = "Hi " + person.getFirstName() + person.getLastName() + "!\n\nSelamat bergabung di Bliken!\n\n";
                 emailHandling = sendEmailService.sendEmail(person.getEmail(), subject, body);
+
+                if(emailHandling){
+                    return CustomResponse.generate(HttpStatus.OK, "Register berhasil!", user);
+                }else{
+                    return CustomResponse.generate(HttpStatus.BAD_REQUEST, "Email tidak terkirim");
+                }      
             }
+            return CustomResponse.generate(HttpStatus.BAD_REQUEST, "Register gagal! Email atau telepon sudah terdaftar");
         }
-        if(emailHandling){
-            model.addAttribute("message", "Register berhasil!");
-            model.addAttribute("buttonLink", "/user-management/login/");
-            model.addAttribute("buttonText", "Kembali ke Halaman Login");
-            return "user/message";    
-        }else{
-            model.addAttribute("message", "Register gagal!");
-            model.addAttribute("buttonLink", "/user-management/register/");
-            model.addAttribute("buttonText", "Kembali ke Halaman Register");  
-            return "user/message";  
-        }
+        return CustomResponse.generate(HttpStatus.BAD_REQUEST, "Register gagal! Email atau telepon sudah terdaftar");
     }
 
-    // loginnn
-    @GetMapping("login")
-    public String index(Model model) {
-        model.addAttribute("login", new LoginDTO());
-        return "user/login";
-    }
-
-    @PostMapping("authenticate")
-    public String authenticate(LoginDTO login, Model model) {
+    // login
+    @PostMapping("user/login")
+    public ResponseEntity<?> login(@RequestBody LoginDTO login) {
         UserDTO user = userRepository.getUsingDTO(login.getEmail());
         if(user != null && passwordEncoder.matches(login.getPassword(), user.getPassword())){
             try {
@@ -129,15 +114,13 @@ public class UserManagementController {
                     "", 
                     userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                return "redirect:/dashboard";
+
+                return CustomResponse.generate(HttpStatus.OK, "Login berhasil!", user);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        model.addAttribute("message", "Email / Password anda salah");
-        model.addAttribute("buttonLink", "/user-management/login/");
-        model.addAttribute("buttonText", "Kembali ke Halaman Login");
-        return "user/message";
+        return CustomResponse.generate(HttpStatus.OK, "Login gagal! Email atau password anda salah");
     }
 
     private static Collection<? extends GrantedAuthority> getAuthorities(String role){
@@ -146,71 +129,39 @@ public class UserManagementController {
         return authorities;
     }
 
-    // forget password
-    @GetMapping("forget-password")
-    public String forgetPassword(Model model) {
-        model.addAttribute("forgetPasswordDTO", new ForgetPasswordDTO()); 
-        return "user/forgetPassword";  
-    }
-
-    @PostMapping("forget-password")
-    public String handleForgetPassword(@ModelAttribute ForgetPasswordDTO forgetPasswordDTO, Model model) {
+    //forget password
+    // http://localhost:8080/api/user/forget-password
+    @PostMapping("user/forget-password")
+    public ResponseEntity<?> forgetPassword(@RequestBody ForgetPasswordDTO forgetPasswordDTO) {
         if(passwordResetService.generateResetToken(forgetPasswordDTO.getEmail())){
-            model.addAttribute("message", "Silahkan cek email anda untuk mereset password");
-            model.addAttribute("buttonLink", "/user-management/login/");
-            model.addAttribute("buttonText", "Kembali ke Halaman Login"); 
-            return "user/message";
+            return CustomResponse.generate(HttpStatus.OK, "Forget password berhasil! Silahkan cek email anda");
         }
         else{
-            model.addAttribute("message", "Email tidak dapat ditemukan");
-            model.addAttribute("buttonLink", "/user-management/forget-password/");
-            model.addAttribute("buttonText", "Kembali"); 
-            return "user/message";
+            return CustomResponse.generate(HttpStatus.OK, "Email tidak ditemukan");
         }
     }
 
-    
-    @GetMapping("reset-password")
-    public String resetPassword(@RequestParam("token") String token, Model model) {
-        if (passwordResetService.validateResetToken(token)) {
-            model.addAttribute("token", token);
-            return "user/resetPassword"; 
-        } else {
-            model.addAttribute("message", "Token Invalid atau Expired");
-            model.addAttribute("buttonLink", "/user-management/login/");
-            model.addAttribute("buttonText", "Kembali ke Halaman Login"); 
-            return "user/message";
-        }
-    }
-
-    @PostMapping("reset-password")
-    public String handleResetPassword(@RequestParam("token") String token, @RequestParam("newPassword") String newPassword, Model model) {
+    //reset password
+    //http://localhost:8080/api/user/reset-password?token=
+    @PostMapping("user/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam("token") String token, @RequestParam("newPassword") String newPassword, Model model) {
         if(passwordResetService.resetPassword(token, newPassword)){
             Optional<PasswordResetToken> resetTokenOpt = tokenRepository.findByToken(token);
             PasswordResetToken resetToken = resetTokenOpt.get();
             tokenRepository.delete(resetToken);
 
-            model.addAttribute("message", "Password berhasil diubah");
-            model.addAttribute("buttonLink", "/user-management/login/");
-            model.addAttribute("buttonText", "Kembali ke Halaman Login");
-            return "user/message";
+            return CustomResponse.generate(HttpStatus.OK, "Reset password berhasil! Silahkan login");
         }else{
-            model.addAttribute("message", "Password gagal diubah");
-            model.addAttribute("buttonLink", "/user-management/login/");
-            model.addAttribute("buttonText", "Kembali ke Halaman Login");
-            return "user/message";
+            return CustomResponse.generate(HttpStatus.NOT_FOUND, "Reset password gagal! Token invalid");
         } 
     }
 
-    @GetMapping("change-password")
-    public String showChangePasswordForm(Model model) {
-        return "user/changePassword";
-    }
-
-    @PostMapping("change-password")
-    public String handleChangePassword(@RequestParam("oldPassword") String oldPassword, @RequestParam("newPassword") String newPassword, Model model) {
+    //change password
+    @PostMapping("user/change-password")
+    public ResponseEntity<?> changePassword(@RequestParam("oldPassword") String oldPassword, @RequestParam("newPassword") String newPassword){
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Integer userId = null;
+        boolean emailHandling = false;
 
         if (principal instanceof UserDTO) {
             UserDTO user = (UserDTO) principal;
@@ -229,19 +180,16 @@ public class UserManagementController {
                         "New Password: " + newPassword + "\n\n" +
                         "Untuk alasan keamanan, jangan berikan password ini kepada siapaun.\n\n" +
                         "Terima kasih";
-                sendEmailService.sendEmail(user.getPerson().getEmail(), subject, body);
+                emailHandling = sendEmailService.sendEmail(user.getPerson().getEmail(), subject, body);
   
-                    model.addAttribute("message", "Password berhasil diubah, silahkan login kembali");
-                    model.addAttribute("buttonLink", "/user-management/login/");
-                    model.addAttribute("buttonText", "Halaman login");
-                    return "user/message";
+                if(emailHandling){
+                    return CustomResponse.generate(HttpStatus.OK, "Pergantian password berhasil! Email terkirim", user);
+                }else{
+                    return CustomResponse.generate(HttpStatus.OK, "Email tidak terkirim");
+                } 
             } 
+            return CustomResponse.generate(HttpStatus.OK, "Pergantian password gagal! Password salah");
         }
-
-        model.addAttribute("message", "Password salah");
-        model.addAttribute("buttonLink", "/user-management/forget-password/");
-        model.addAttribute("buttonText", "Forget password");
-        return "user/message";  
+        return CustomResponse.generate(HttpStatus.OK, "Pergantian password gagal! Silahkan login dahulu");
     }
-    
 }

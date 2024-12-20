@@ -12,7 +12,9 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private String roleName;
+    private String email;
     private String password;
+
 
     @Override
     public String toString() {
@@ -21,8 +23,10 @@ public class UserDTO {
             ", firstName='" + getFirstName() + "'" +
             ", lastName='" + getLastName() + "'" +
             ", roleName='" + getRoleName() + "'" +
+            ", email='" + getEmail() + "'" +
             ", password='" + getPassword() + "'" +
             "}";
     }
+    
 
 }

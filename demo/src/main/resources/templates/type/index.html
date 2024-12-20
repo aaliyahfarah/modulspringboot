@@ -1,47 +1,183 @@
 <html>
-    <head>
-        <title>Type Management</title>
-    </head>
-    <body>
-        <!-- <a th:href="@{/vehicle/form}">CREATE NEW VEHICLE</a> -->
-        <a th:href="@{'/type/form'}">
-            <button>CREATE NEW TYPE</button>
-         </a>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>NAME</th>
-                    <th>YEAR</th>
-                    <th>PRICE</th>
-                    <th>BRAND</th>
-                    <th>CATEGORY</th>
-                    <th colspan="2">ACTION</th>  
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="type : ${types}"> 
-                    <td th:text="${type.id}"></td>
-                    <td th:text="${type.name}"></td>
-                    <td th:text="${type.year}"></td>
-                    <td th:text="'Rp' + ${#numbers.formatDecimal(type.price, 2, 2)}"></td>
-                    <!-- <td th:text="${(type.price)}"></td> -->
-                    <!-- <td th:text="${String.format('%.2f', type.price)}"></td> -->
-                    <!-- String.format("%.2f", getPrice()) -->
-                    <td th:text="${type.brand}"></td>
-                    <td th:text="${type.category}"></td> 
-                    <td>
-                        <a th:href="@{'/type/form/' + ${type.id}}" style="display:inline;">
-                            <button>EDIT</button>
-                        </a> 
-                    </td>
-                        <td>
-                        <form method="POST" th:action="@{'/type/delete/' + ${type.id}}" style="display:inline;">
-                            <button type="submit" onclick="return confirm('Apakah anda yakin ingin menghapus?');">DELETE</button>
-                        </form>
-                    </td>
-                </tr> 
-            </tbody> 
-        </table>
-    </body>
+
+<head>
+  <title>Type Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" /> -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+</head>
+
+<body>
+  <div class="container-fluid mt-3 mb-3 ms-3 me-3">
+    <!-- <a th:href="@{/vehicle/form}">CREATE NEW VEHICLE</a> -->
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      Create new type
+    </button>
+    <!-- <a th:href="@{'/type/form'}">
+          <button>CREATE NEW TYPE</button>
+      </a> -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Create category</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- ID -->
+            <input id="id" placeholder="Masukkan ID" type="text" hidden />
+            <!-- nama -->
+            <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" id="inputGroup-sizing-sm">Nama Tipe</span>
+              <input type="text" class="form-control" placeholder="Masukkan tipe" aria-label="nama tipe"
+                aria-describedby="inputGroup-sizing-sm" required />
+            </div>
+            <!-- tahun -->
+            <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" id="inputGroup-sizing-sm">Tahun</span>
+              <input type="text" class="form-control" placeholder="Masukkan tahun" aria-label="tahun"
+                aria-describedby="inputGroup-sizing-sm" required />
+            </div>
+            <!-- Price -->
+            <div class="input-group input-group-sm mb-3">
+              <span class="input-group-text" id="inputGroup-sizing-sm">Harga</span>
+              <input type="text" class="form-control" placeholder="Masukkan harga" aria-label="harga"
+                aria-describedby="inputGroup-sizing-sm" required />
+            </div>
+            <!-- Dropdown Brand -->
+            <div class="input-group input-group-sm mb-3">
+              <label class="input-group-text" for="optionBrand">Merek</label>
+              <select class="form-select" id="optionBrand" required></select>
+            </div>
+            <!-- Dropdown Category -->
+            <div class="input-group input-group-sm mb-3">
+              <label class="input-group-text" for="optionCategory">Kategori</label>
+              <select class="form-select" id="optionCategory" required></select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              Close
+            </button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <table id="typeTable" class="display" style="width:100%">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Nama</th>
+            <th>Tahun</th>
+            <th>Harga</th>
+            <th>Merek</th>
+            <th>Kategori</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <!-- <td th:text="${type.brand}"></td>
+          <td th:text="${type.category}"></td>
+          <td>
+            <a th:href="@{'/type/form/' + ${type.id}}" style="display: inline">
+              <button>EDIT</button>
+            </a>
+          </td>
+          <td>
+            <form method="POST" th:action="@{'/type/delete/' + ${type.id}}" style="display: inline">
+              <button type="submit" onclick="return confirm('Apakah anda yakin ingin menghapus?');">
+                DELETE
+              </button>
+            </form>
+          </td>
+  </div>
+<!-- </body> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+
+    <!-- script -->
+    <script>
+      $(document).ready(function () {
+        $.ajax({
+          url: '/api/brand',
+          type: 'GET',
+          success: function (data) {
+            $('#optionBrand').empty();
+
+            $('#optionBrand').append('<option value="" disabled selected>Pilih brand</option>');
+
+            $.each(data, function (index, brand) {
+              var option = $('<option>', {
+                value: brand.id,
+                text: brand.name
+              });
+              $('#optionBrand').append(option);
+            });
+          }
+        });
+
+        $.ajax({
+          url: '/api/category',
+          type: 'GET',
+          success: function (data) {
+            $('#optionCategory').empty();
+
+            $('#optionCategory').append('<option value="" disabled selected>Pilih kategori</option>');
+
+            $.each(data, function (index, category) {
+              var option = $('<option>', {
+                value: category.id,
+                text: category.name
+              });
+              $('#optionCategory').append(option);
+            });
+          }
+        });
+        $('#typeTable').DataTable({
+          ajax: {
+            url: '/api/type',
+            type: 'GET',
+            dataSrc: function (json) {
+              return json;
+            }
+          },
+          columns: [
+            { data: 'id' },
+            { data: 'name' },
+            { data: 'year' },
+            {
+              data: 'price',
+              render: function (data, type, row) {
+                if (type === 'display') {
+                  return 'Rp ' + data.toLocaleString('id-ID') + ',00';
+                }
+                return data;
+              },
+              type: 'num',
+            },
+            { data: 'brand.name' },
+            { data: 'category.name' },
+            {
+              data: null, 
+              render: function (data, type, row) {
+                return `
+                <button class="btn btn-primary btn-sm" onclick="editRow(${row.id})">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteRow(${row.id})">Delete</button>
+              `;
+              }
+            }
+          ]
+        });
+      });
+    </script>
+
 </html>
