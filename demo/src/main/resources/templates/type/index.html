@@ -4,10 +4,14 @@
   <title>Type Management</title>
 
   <link rel="stylesheet" href="/styles.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" /> -->
   <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.1/css/buttons.dataTables.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.15.3/dist/sweetalert2.min.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -29,6 +33,7 @@
                 <th>Harga</th>
                 <th>Merek</th>
                 <th>Kategori</th>
+                <th>Notifikasi</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -95,6 +100,8 @@
   src="https://cdn.datatables.net/buttons/2.3.1/js/dataTables.buttons.min.js"></script>
 <script type="text/javascript" charset="utf8"
   src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
   function brandOption(selectBrandId = null) {
@@ -194,7 +201,7 @@
     var brandId = $('#optionBrand').val();
     var categoryId = $('#optionCategory').val();
 
-    console.log(brandId);
+    //console.log(brandId);
 
     if (!typeName || !typeYear || !typePrice || !brandId || !categoryId) {
       alert('Please fill all required fields!');
@@ -215,6 +222,14 @@
         contentType: 'application/json',
         success: function (response) {
           $('#typeModal').modal('hide');
+
+          Swal.fire({
+            icon: "success",
+            title: "Data berhasil ditambahkan",
+            showConfirmButton: false,
+            timer: 2000
+          });
+
           $('#typeTable').DataTable().ajax.reload();
         },
         error: function (xhr, status, error) {
@@ -224,45 +239,100 @@
     }
     //edit
     else {
-      $.ajax({
-        url: '/api/type/edit/' + typeId,
-        type: 'PUT',
-        data: JSON.stringify({
-          id: typeId,
-          name: typeName,
-          year: typeYear,
-          price: typePrice,
-          brand: { id: brandId },
-          category: { id: categoryId }
-        }),
-        contentType: 'application/json',
-        success: function (response) {
-          $('#typeModal').modal('hide');
-          $('#typeTable').DataTable().ajax.reload();
-        },
-        error: function (xhr, status, error) {
-          alert('Error: ' + error);
+      Swal.fire({
+        title: "Apakah anda yakin ingin mengubah data?",
+        showCancelButton: true,
+        confirmButtonText: "Save",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: '/api/type/edit/' + typeId,
+            type: 'PUT',
+            data: JSON.stringify({
+              id: typeId,
+              name: typeName,
+              year: typeYear,
+              price: typePrice,
+              brand: { id: brandId },
+              category: { id: categoryId }
+            }),
+            contentType: 'application/json',
+            success: function (response) {
+              $('#typeModal').modal('hide');
+
+              Swal.fire({
+                icon: "success",
+                title: "Data berhasil diperbarui",
+                showConfirmButton: false,
+                timer: 2000
+              });
+
+              $('#typeTable').DataTable().ajax.reload();
+            },
+            error: function (xhr, status, error) {
+              alert('Error: ' + error);
+            }
+          });
         }
       });
     }
   }
 
-  //delete
   function deleteType(id) {
-    if (confirm('Apakah anda yakin ingin menghapusnya?')) {
-      $.ajax({
-        url: '/api/type/delete/' + id,
-        type: 'DELETE',
-        success: function (data) {
-          $('#typeTable').DataTable().ajax.reload();
-        },
-        error: function (xhr, status, error) {
-          alert('Error fetching data: ' + error);
+    Swal.fire({
+      title: 'Delete',
+      text: 'Apakah Anda yakin ingin menghapusnya?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, hapus',
+      cancelButtonText: 'Batal',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: '/api/type/delete/' + id,
+          type: 'DELETE',
+          success: function (data) {
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'Data telah dihapus',
+              icon: 'success',
+              showConfirmButton: false,
+              timer: 2000
+            });
+            $('#typeTable').DataTable().ajax.reload();
+          },
+          error: function (xhr, status, error) {
+            Swal.fire('Error', 'Terjadi kesalahan saat menghapus data.', 'error');
+          }
+        });
+      } else if (result.isDismissed) {
+        Swal.fire('Batal', 'Penghapusan dibatalkan', 'error');
+      }
+    });
+  }
+
+
+  function updateSwitchStatus(id, isActive) {
+    $.ajax({
+      url: '/api/type/edit-alert/' + id,
+      type: 'PUT',
+      data: JSON.stringify({
+        isActive: isActive
+      }),
+      contentType: 'application/json',
+      success: function (response) {
+        // console.log(isActive);
+        if (isActive) {
+          Swal.fire('Sukses!', 'Notifikasi berhasil dinyalakan', 'success');
+        } else {
+          Swal.fire('Sukses!', 'Notifikasi berhasil dimatikan', 'success');
         }
-      });
-    } else {
-      return;
-    }
+      },
+      error: function (xhr, status, error) {
+        alert('Error: ' + error);
+      }
+    });
   }
 
   $(document).ready(function () {
@@ -306,7 +376,17 @@
         { data: 'brand.name' },
         { data: 'category.name' },
         {
-          data: 'id',
+          data: 'isActive',
+          render: function (data, type, row) {
+            return `
+          <div class="form-check form-switch">
+            <input class="form-check-input switch-checkbox" type="checkbox" id="${row.id}" ${data ? 'checked' : ''}>
+          </div>
+        `;
+          }
+        },
+        {
+          data: null,
           render: function (data, type, row) {
             return `
                 <button class="btn btn-primary btn-sm" onclick="editType(${row.id})">Edit</button>
@@ -317,10 +397,19 @@
       ],
 
       columnDefs: [
-        { orderable: false, targets: 7 },
+        { orderable: false, targets: [7, 8] },
         { visible: false, targets: 1 }
       ]
     });
+
+    $('#typeTable').on('change', '.form-check-input.switch-checkbox', function () {
+      const isChecked = $(this).prop('checked');
+      const rowId = $(this).attr('id');
+      console.log(rowId);
+
+      updateSwitchStatus(rowId, isChecked);
+    });
+
   });
 </script>
 

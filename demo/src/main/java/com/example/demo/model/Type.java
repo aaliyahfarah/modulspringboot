@@ -29,6 +29,7 @@ public class Type {
     private String name;
     private Integer year;
     private Double price;
+    private Boolean isActive;
 
     @ManyToOne
     @JoinColumn(name = "tb_m_category_id", referencedColumnName = "id")

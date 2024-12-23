@@ -1,5 +1,7 @@
 package com.example.demo.controller.api;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,10 +60,15 @@ public class TypeRestController {
         Brand brand = brandRepository.findById(type.getBrand().getId()).orElse(null);
         Category category = categoryRepository.findById(type.getCategory().getId()).orElse(null);
 
+        if (type.getIsActive() == null) {
+            type.setIsActive(true);
+        }
+
         Type newType = new Type();
         newType.setName(type.getName());
         newType.setYear(type.getYear());
         newType.setPrice(type.getPrice());
+        newType.setIsActive(type.getIsActive());
         newType.setBrand(brand);
         newType.setCategory(category);
 
@@ -80,9 +87,24 @@ public class TypeRestController {
         existingType.setName(type.getName());
         existingType.setYear(type.getYear());
         existingType.setPrice(type.getPrice());
+        // existingType.setIsActive(type.getIsActive());
         existingType.setBrand(brand);
         existingType.setCategory(category);
         typeRepository.save(existingType);
+        return CustomResponse.generate(HttpStatus.OK, "data berhasil diubah");
+    }
+
+    //edit notif
+    @PutMapping("type/edit-alert/{id}")
+    public ResponseEntity<Object> editNotif(@RequestBody Map<String, Boolean> requestBody, @PathVariable Integer id) {
+        Boolean isActive = requestBody.get("isActive");
+
+        Type existingType = typeRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid type ID: " + id));
+
+        existingType.setIsActive(isActive);
+        typeRepository.save(existingType);
+
         return CustomResponse.generate(HttpStatus.OK, "data berhasil diubah");
     }
 
