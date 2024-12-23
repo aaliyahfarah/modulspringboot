@@ -1,206 +1,215 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Brand Management</title>
 
-        <link rel="stylesheet" href="/styles.css">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-        <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.1/css/buttons.dataTables.min.css">
-    </head>
-    <body>
-        <div class="container-fluid pt-3 pb-3 ps-3 pe-3">
-          <div class="mb-4">
-            <h1 class="fw-bold text-center">Brand Management</h1>
-          </div>
-          <div class="row">
-      
-          <div>
-            <div class="container-fluid" style="width:95%">
-              <table id="brandTable" class="display" style="width:100%">
-                <thead>
-                  <tr>
-                    <th>Id</th>
-                    <th>Nama</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-              </table>
+<head>
+  <title>Brand Management</title>
+
+  <link rel="stylesheet" href="/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.1/css/buttons.dataTables.min.css">
+</head>
+
+<body>
+  <div class="container-fluid pt-3 pb-3 ps-3 pe-3">
+    <div class="mb-4">
+      <h1 class="fw-bold text-center">Brand Management</h1>
+    </div>
+    <div class="row">
+
+      <div>
+        <div class="container-fluid" style="width:95%">
+          <table id="brandTable" class="display" style="width:100%">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Id</th>
+                <th>Nama</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal fade" id="brandModal" tabindex="-1" aria-labelledby="brandModal" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Brand</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-          </div>
-          
-          <div class="modal fade" id="brandModal" tabindex="-1" aria-labelledby="brandModal" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Brand</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <!-- ID -->
-                  <input id="id" placeholder="Masukkan ID" type="text" hidden />
-                  <!-- nama -->
-                  <div class="input-group input-group-sm mb-3">
-                    <!-- <span class="input-group-text" id="inputGroup-sizing-sm">Nama Kategori</span> -->
-                    <input type="text" class="form-control" placeholder="Masukkan nama brand" aria-label="nama tipe"
-                      aria-describedby="inputGroup-sizing-sm" id="brandName" required />
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Close
-                  </button>
-                  <button type="button" class="btn btn-primary" onclick="saveBrand()">Save</button>
-                </div>
+            <div class="modal-body">
+              <!-- ID -->
+              <input id="id" placeholder="Masukkan ID" type="text" hidden />
+              <!-- nama -->
+              <div class="input-group input-group-sm mb-3">
+                <!-- <span class="input-group-text" id="inputGroup-sizing-sm">Nama Kategori</span> -->
+                <input type="text" class="form-control" placeholder="Masukkan nama brand" aria-label="nama tipe"
+                  aria-describedby="inputGroup-sizing-sm" id="brandName" required />
               </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                Close
+              </button>
+              <button type="button" class="btn btn-primary" onclick="saveBrand()">Save</button>
             </div>
           </div>
         </div>
-      </body>
-   
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
-    <script type="text/javascript" charset="utf8"
-      src="https://cdn.datatables.net/buttons/2.3.1/js/dataTables.buttons.min.js"></script>
-    <script type="text/javascript" charset="utf8"
-      src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    
-    <script>
-      //create 
-      function createBrand() {
-        $('#id').val('');
-        $('#brandName').val('');
-    
+      </div>
+    </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script type="text/javascript" charset="utf8"
+  src="https://cdn.datatables.net/buttons/2.3.1/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" charset="utf8"
+  src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+
+<script>
+  //create 
+  function createBrand() {
+    $('#id').val('');
+    $('#brandName').val('');
+
+    $('#brandModal').modal('show');
+  }
+
+  function editBrand(id) {
+    $.ajax({
+      url: '/api/brand/' + id,
+      type: 'GET',
+      success: function (response) {
+        const brandData = response.data;
+        // console.log(brandData);
+        $('#id').val(brandData.id);
+        $('#brandName').val(brandData.name);
+
         $('#brandModal').modal('show');
+      },
+      error: function (xhr, status, error) {
+        alert('Error fetching data: ' + error);
       }
-    
-      function editBrand(id) {
-        $.ajax({
-          url: '/api/brand/' + id,
-          type: 'GET',
-          success: function (data) {
-            // console.log(data);
-            $('#id').val(data.id);
-            $('#brandName').val(data.name);
-    
-            $('#brandModal').modal('show');
-          },
-          error: function (xhr, status, error) {
-            alert('Error fetching data: ' + error);
+    });
+  }
+
+  //save
+  function saveBrand() {
+    var brandId = $('#id').val();
+    var brandName = $('#brandName').val();
+
+    console.log(brandId);
+
+    if (!brandName) {
+      alert('Please fill all required fields!');
+      return;
+    }
+    //create
+    else if (!brandId) {
+      $.ajax({
+        url: '/api/brand/create',
+        type: 'POST',
+        data: JSON.stringify({
+          name: brandName,
+        }),
+        contentType: 'application/json',
+        success: function (response) {
+          $('#brandModal').modal('hide');
+          $('#brandTable').DataTable().ajax.reload();
+        },
+        error: function (xhr, status, error) {
+          alert('Error: ' + error);
+        }
+      });
+    }
+    //edit
+    else {
+      $.ajax({
+        url: '/api/brand/edit/' + brandId,
+        type: 'PUT',
+        data: JSON.stringify({
+          id: brandId,
+          name: brandName,
+        }),
+        contentType: 'application/json',
+        success: function (response) {
+          $('#brandModal').modal('hide');
+          $('#brandTable').DataTable().ajax.reload();
+        },
+        error: function (xhr, status, error) {
+          alert('Error: ' + error);
+        }
+      });
+    }
+  }
+
+  //delete
+  function deleteBrand(id) {
+    if (confirm('Apakah anda yakin ingin menghapusnya?')) {
+      $.ajax({
+        url: '/api/brand/delete/' + id,
+        type: 'DELETE',
+        success: function (data) {
+          $('#brandTable').DataTable().ajax.reload();
+        },
+        error: function (xhr, status, error) {
+          alert('Error fetching data: ' + error);
+        }
+      });
+    } else {
+      return;
+    }
+  }
+
+  $(document).ready(function () {
+    //datatable
+    $('#brandTable').DataTable({
+      ajax: {
+        url: '/api/brand',
+        type: 'GET',
+        dataSrc: "data"
+      },
+      dom: '<"top"Bf>rt<"bottom"ilp><"clear">',
+      buttons: [
+        {
+          text: 'Create new brand',
+          className: 'btn btn-primary mb-3',
+          action: function (e, dt, node, config) {
+            createBrand();
           }
-        });
-      }
-    
-      //save
-      function saveBrand() {
-        var brandId = $('#id').val();
-        var brandName = $('#brandName').val();
-    
-        console.log(brandId);
-    
-        if (!brandName) {
-          alert('Please fill all required fields!');
-          return;
         }
-        //create
-        else if (!brandId) {
-          $.ajax({
-            url: '/api/brand/create',
-            type: 'POST',
-            data: JSON.stringify({
-              name: brandName,
-            }),
-            contentType: 'application/json',
-            success: function (response) {
-              $('#brandModal').modal('hide');
-              $('#brandTable').DataTable().ajax.reload();
-            },
-            error: function (xhr, status, error) {
-              alert('Error: ' + error);
-            }
-          });
-        }
-        //edit
-        else {
-          $.ajax({
-            url: '/api/brand/edit/' + brandId,
-            type: 'PUT',
-            data: JSON.stringify({
-              id: brandId,
-              name: brandName,
-            }),
-            contentType: 'application/json',
-            success: function (response) {
-              $('#brandModal').modal('hide');
-              $('#brandTable').DataTable().ajax.reload();
-            },
-            error: function (xhr, status, error) {
-              alert('Error: ' + error);
-            }
-          });
-        }
-      }
-    
-      //delete
-      function deleteBrand(id) {
-        if (confirm('Apakah anda yakin ingin menghapusnya?')) {
-          $.ajax({
-            url: '/api/brand/delete/' + id,
-            type: 'DELETE',
-            success: function (data) {
-              $('#brandTable').DataTable().ajax.reload();
-            },
-            error: function (xhr, status, error) {
-              alert('Error fetching data: ' + error);
-            }
-          });
-        } else {
-          return;
-        }
-      }
-    
-      $(document).ready(function () {
-        //datatable
-        $('#brandTable').DataTable({
-          ajax: {
-            url: '/api/brand',
-            type: 'GET',
-            dataSrc: function (json) {
-              return json;
-            }
+      ],
+      columns: [
+        {
+          data: null,
+          render: function (data, type, row, meta) {
+            return meta.row + 1;
           },
-          dom: '<"top"Bf>rt<"bottom"ilp><"clear">',
-          buttons: [
-            {
-              text: 'Create new brand',
-              className: 'btn btn-primary mb-3',
-              action: function (e, dt, node, config) {
-                createBrand();
-              }
-            }
-          ],
-          columns: [
-            { data: 'id' },
-            { data: 'name' },
-            {
-              data: 'id',
-              render: function (data, type, row) {
-                return `
+        },
+        { data: 'id' },
+        { data: 'name' },
+        {
+          data: 'id',
+          render: function (data, type, row) {
+            return `
                     <button class="btn btn-primary btn-sm" onclick="editBrand(${row.id})">Edit</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteBrand(${row.id})">Delete</button>
                   `;
-              }
-            }
-          ],
-    
-          columnDefs: [
-            { orderable: false, targets: -1 }
-          ]
-        });
-      });
-    </script>
-        
+          }
+        }
+      ],
+
+      columnDefs: [
+        { orderable: false, targets: 3 },
+        { visible: false, targets: 1 }
+      ]
+    });
+  });
+</script>
+
 </html>

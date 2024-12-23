@@ -22,6 +22,7 @@
           <table id="typeTable" class="display" style="width:100%">
             <thead>
               <tr>
+                <th>No</th>
                 <th>Id</th>
                 <th>Nama</th>
                 <th>Tahun</th>
@@ -100,12 +101,13 @@
     $.ajax({
       url: '/api/brand',
       type: 'GET',
-      success: function (data) {
+      success: function (response) {
+        const brandData = response.data;
         $('#optionBrand').empty();
 
         $('#optionBrand').append('<option value="" disabled selected>Pilih brand</option>');
 
-        $.each(data, function (index, brand) {
+        $.each(brandData, function (index, brand) {
           var option = $('<option>', {
             value: brand.id,
             text: brand.name
@@ -125,12 +127,13 @@
     $.ajax({
       url: '/api/category',
       type: 'GET',
-      success: function (data) {
+      success: function (response) {
+        const categoryData = response.data;
         $('#optionCategory').empty();
 
         $('#optionCategory').append('<option value="" disabled selected>Pilih kategori</option>');
 
-        $.each(data, function (index, category) {
+        $.each(categoryData, function (index, category) {
           var option = $('<option>', {
             value: category.id,
             text: category.name
@@ -163,15 +166,16 @@
     $.ajax({
       url: '/api/type/' + id,
       type: 'GET',
-      success: function (data) {
-        // console.log(data);
-        $('#id').val(data.id);
-        $('#typeName').val(data.name);
-        $('#typeYear').val(data.year);
-        $('#typePrice').val(data.price);
+      success: function (response) {
+        const typeData = response.data;
+        //console.log(typeData.brand.id);
+        $('#id').val(typeData.id);
+        $('#typeName').val(typeData.name);
+        $('#typeYear').val(typeData.year);
+        $('#typePrice').val(typeData.price);
 
-        brandOption(data.brand.id);
-        categoryOption(data.category.id);
+        brandOption(typeData.brand.id);
+        categoryOption(typeData.category.id);
 
         $('#typeModal').modal('show');
       },
@@ -267,9 +271,7 @@
       ajax: {
         url: '/api/type',
         type: 'GET',
-        dataSrc: function (json) {
-          return json;
-        }
+        dataSrc: "data"
       },
       dom: '<"top"Bf>rt<"bottom"ilp><"clear">',
       buttons: [
@@ -282,6 +284,12 @@
         }
       ],
       columns: [
+        {
+          data: null,
+          render: function (data, type, row, meta) {
+            return meta.row + 1;
+          },
+        },
         { data: 'id' },
         { data: 'name' },
         { data: 'year' },
@@ -309,7 +317,8 @@
       ],
 
       columnDefs: [
-        { orderable: false, targets: 6 }
+        { orderable: false, targets: 7 },
+        { visible: false, targets: 1 }
       ]
     });
   });

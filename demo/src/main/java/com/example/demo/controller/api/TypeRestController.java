@@ -1,7 +1,5 @@
 package com.example.demo.controller.api;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,14 +36,21 @@ public class TypeRestController {
     }
 
     @GetMapping("type")
-    public List<Type> get() {
-        return typeRepository.findAll();
+    public ResponseEntity<Object> get() {
+        return CustomResponse.generate(HttpStatus.OK, "data berhasil didapatkan", typeRepository.findAll());
     }
 
     @GetMapping("type/{id}")
-    public Type get(@PathVariable(required = true) Integer id) {
-        return typeRepository.findById(id).orElse(null);
+    public ResponseEntity<Object> get(@PathVariable(required = true) Integer id) {
+        Type type = typeRepository.findById(id).orElse(null);
+        if(type != null){
+            return CustomResponse.generate(HttpStatus.OK, "data berhasil didapatkan", type);
+        }
+        else{
+            return CustomResponse.generate(HttpStatus.OK, "data tidak ditemukan");
+        }
     }
+
 
     // create
     @PostMapping("type/create")

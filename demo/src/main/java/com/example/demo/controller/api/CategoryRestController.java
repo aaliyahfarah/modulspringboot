@@ -1,7 +1,5 @@
 package com.example.demo.controller.api;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +22,19 @@ public class CategoryRestController {
     @Autowired private CategoryRepository categoryRepository;
 
     @GetMapping("category")
-    public List<Category> get() {
-        return categoryRepository.findAll();
+    public ResponseEntity<Object> get() {
+        return CustomResponse.generate(HttpStatus.OK, "data berhasil didapatkan", categoryRepository.findAll());
     }
 
     @GetMapping("category/{id}")
-    public Category get(@PathVariable(required = true) Integer id) {
-        return categoryRepository.findById(id).orElse(null);
+    public ResponseEntity<Object> get(@PathVariable(required = true) Integer id) {
+        Category category = categoryRepository.findById(id).orElse(null);
+        if(category != null){
+            return CustomResponse.generate(HttpStatus.OK, "data berhasil didapatkan", category);
+        }
+        else{
+            return CustomResponse.generate(HttpStatus.OK, "data tidak ditemukan");
+        }
     }
 
     // create

@@ -1,6 +1,5 @@
 package com.example.demo.controller.api;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,13 +23,19 @@ public class BrandRestController {
     @Autowired private BrandRepository brandRepository;
 
     @GetMapping("brand")
-    public List<Brand> get() {
-        return brandRepository.findAll();
+    public ResponseEntity<Object> get() {
+        return CustomResponse.generate(HttpStatus.OK, "data berhasil didapatkan", brandRepository.findAll());
     }
 
     @GetMapping("brand/{id}")
-    public Brand get(@PathVariable(required = true) Integer id) {
-        return brandRepository.findById(id).orElse(null);
+    public ResponseEntity<Object> get(@PathVariable(required = true) Integer id) {
+        Brand brand = brandRepository.findById(id).orElse(null);
+        if(brand != null){
+            return CustomResponse.generate(HttpStatus.OK, "data berhasil didapatkan", brand);
+        }
+        else{
+            return CustomResponse.generate(HttpStatus.OK, "data tidak ditemukan");
+        }
     }
 
     // create
