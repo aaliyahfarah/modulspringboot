@@ -4,6 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,5 +26,7 @@ public class Vehicle {
     @JoinColumn(name = "tb_m_type_id", referencedColumnName = "id")
     private Type type;
 
-    //one to one
+    @OneToOne(mappedBy = "vehicle")
+    @JsonIgnore
+    private PurchaseDetail purchaseDetail;
 }

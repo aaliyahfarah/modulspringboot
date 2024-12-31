@@ -13,7 +13,6 @@ import com.example.demo.model.Category;
 import com.example.demo.model.dto.UserDTO;
 import com.example.demo.repository.BrandRepository;
 import com.example.demo.repository.CategoryRepository;
-import com.example.demo.repository.PersonRepository;
 import com.example.demo.repository.TypeRepository;
 import com.example.demo.repository.UserRepository;
 

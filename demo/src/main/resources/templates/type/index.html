@@ -323,9 +323,9 @@
       contentType: 'application/json',
       success: function (response) {
         // console.log(isActive);
-        if (isActive) {
+        if(isActive){
           Swal.fire('Sukses!', 'Notifikasi berhasil dinyalakan', 'success');
-        } else {
+        }else{
           Swal.fire('Sukses!', 'Notifikasi berhasil dimatikan', 'success');
         }
       },
@@ -405,6 +405,7 @@
     $('#typeTable').on('change', '.form-check-input.switch-checkbox', function () {
       const isChecked = $(this).prop('checked');
       const rowId = $(this).attr('id');
+      // $('#id').val()
       console.log(rowId);
 
       updateSwitchStatus(rowId, isChecked);

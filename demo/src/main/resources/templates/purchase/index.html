@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Management</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.datatables.net/buttons/2.3.1/css/buttons.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.15.3/dist/sweetalert2.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+    <div>
+        <div class="container-fluid" style="width:95%">
+            <h1>Purchase</h1>
+            <table id="purchaseTable" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Id</th>
+                        <th>Tanggal</th>
+                        <th>Nama depan</th>
+                        <th>Nama belakang</th>
+                        <th>Total amount</th>
+                        <th>Metode Pembayaran</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+<script type="text/javascript" charset="utf8"
+    src="https://cdn.datatables.net/buttons/2.3.1/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" charset="utf8"
+    src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function () {
+        //datatable
+        $('#purchaseTable').DataTable({
+                searching: true,
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: '/api/purchase',
+                    type: 'GET',
+                    data: function(d){
+                        d.search = d.search.value
+                    },
+                    dataSrc: "data",
+                    dataType: "json"
+                },
+                columns: [
+                    {
+                        "data": null,
+                        render: function (data, type, row, meta) {
+                            return meta.row + 1;
+                        },
+                    },
+                    { "data": "id" },
+                    { "data": "date" },
+                    { "data": "firstName" },
+                    { "data": "lastName" },
+                    { "data": "totalAmount" },
+                    { "data": "paymentMethod" }
+                ],
+
+                columnDefs: [
+                    { orderable: false, targets: [-2] },
+                    { visible: false, targets: 1 }
+                ]
+            });
+        });
+</script>
+
+</html>

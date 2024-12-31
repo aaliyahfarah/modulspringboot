@@ -43,4 +43,9 @@ public class Type {
     @OneToMany(mappedBy = "type")
     @JsonIgnore
     private List<Vehicle> vehicles;
+
+    @ManyToOne
+    @JoinColumn(name = "tb_m_asset", referencedColumnName = "id")
+    private Asset asset ;
+
 }

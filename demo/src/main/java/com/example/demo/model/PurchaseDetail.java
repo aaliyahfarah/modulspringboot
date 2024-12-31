@@ -6,6 +6,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,20 +22,19 @@ import lombok.NoArgsConstructor;
 
 public class PurchaseDetail {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private Double afterTaxPrice;
-    // private String vehicleId;
-    // private Integer purchaseId;
+    private String vehicleId;
+    
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "tb_m_vehicle_id", referencedColumnName = "id")
+    private Vehicle vehicle;
 
-    //One to one
-    //private Vehicle vehicle;
+    private Double afterTaxPrice;
 
     //many to one purchase 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "tb_tr_purchase_id", referencedColumnName = "id")
     private Purchase purchase;
 
-    //one to one vehicle
-    //
 }

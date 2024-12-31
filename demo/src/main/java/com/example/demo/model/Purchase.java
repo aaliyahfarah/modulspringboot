@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -14,22 +15,23 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "tb_tr_purchase")           // define sebuah table di database
+@Entity   
+@Table(name = "tb_tr_purchase")      // define sebuah table di database
 @Data                                      // anotasI data, gantinya get set dari lombok
 @AllArgsConstructor                        // constructor dengan parameter semua properti
 @NoArgsConstructor                         // constructor dengan tidak ada parameter
-
 public class Purchase {
     @Id //pk ke pdetail
     private String id;
     private String date;
-    private Double total_amount;
+    private Double totalAmount;
 
     @ManyToOne
     @JoinColumn(name = "tb_m_user_id", referencedColumnName = "id")
     private User user;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "tb_m_payment_method_id", referencedColumnName = "id")
     private PaymentMethod paymentMethod; 
 
